@@ -38,7 +38,17 @@ public abstract class Piece { //Superclass for all chess pieces
 		return returned;
 	}
 	
-	
+	public ArrayList<Position> removeFriendlyFire(ArrayList<Position> positions) {
+		for (Position pos : positions) {
+			if (myBoard.getBoard()[pos.column][pos.row] == null) {
+				;
+			}
+			else if (myBoard.getBoard()[pos.column][pos.row].isOnWhiteTeam == isOnWhiteTeam ) {
+				positions.remove(pos);
+			}
+		}
+		return positions;
+	}
 	public abstract ArrayList<Position> possiblesMoves();
 
 }
