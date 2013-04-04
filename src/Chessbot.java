@@ -6,9 +6,9 @@ public class Chessbot { //main class
 		ChessApplication.InitializeChessApplication(640, 480);
 		Board board = new Board();
 		//tests board creation:
-		for (int i = 0; i < 8; i++) {
-			for (int j = 7; j >= 0; j--) {
-				if (board.getBoard()[i][j] == null) {
+		for (int i = 7; i >=0; i--) {
+			for (int j = 0; j < 8; j++) {
+				if (board.getBoard()[j][i] == null) {
 					System.out.print("empty");
 				}
 				else {
