@@ -2,10 +2,10 @@ import java.util.ArrayList;
 
 
 public class Rook extends Piece {
-	public Rook(Board board, int theRow, int theColumn, boolean whiteTeam) { //constructor
-		super(board, theRow, theColumn, whiteTeam);
+	public Rook(Board board, int theColumn, int theRow, boolean whiteTeam) { //constructor
+		super(board, theColumn, theRow, whiteTeam);
 	}
-	public ArrayList<int[]> possiblesMoves() {
+	public ArrayList<Position> possiblesMoves() {
 		return null;
 	}
 

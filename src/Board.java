@@ -1,26 +1,57 @@
 
 public class Board {
 	private Piece[][] daBoard = new Piece[8][8]; //2D array representing the chessboard
-	public Board() {
+	public Board() { //creates a new chess board with all pieces in their starting positions
 		for (int i = 0; i < 8; i++) {
-			new Pawn(this, 1, i, false); //creates black pawns - far side
-			new Pawn(this, 6, i, true); //creates white pawns - near side
+			new Pawn(this, i, 1, false); //creates black pawns - far side
+			new Pawn(this, i, 6, true); //creates white pawns - near side
 		}
+		//white rooks:
+		new Rook(this, 0, 0, true);
+		new Rook(this, 7, 0, true);
+		//black rooks:
+		new Rook(this, 0, 7, false);
+		new Rook(this, 7, 7, false);
+		//white knights:
+		new Knight(this, 1, 0, true);
+		new Knight(this, 6, 0, true);
+		//black knights:
+		new Knight(this, 1, 7, false);
+		new Knight(this, 6, 7, false);
+		//white bishops:
+		new Bishop(this, 2, 0, true);
+		new Bishop(this, 5, 0, true);
+		//black bishops:
+		new Bishop(this, 2, 7, false);
+		new Bishop(this, 5, 7, false);
+		//white queen:
+		new Queen(this, 3, 0, true);
+		//black queen:
+		new Queen(this, 3, 7, false);
+		//white king:
+		new King(this, 4, 0, true);
+		//black king:
+		new King(this, 4, 7, false);
 	}
 	public void add(Piece piece) { //adds a Piece - the location is contained within the piece object
-		daBoard[piece.getRow()][piece.getColumn()] = piece;
+		daBoard[piece.getColumn()][piece.getRow()] = piece;
 	}
 	public void remove(Piece piece) { //removes a Piece
-		daBoard[piece.getRow()][piece.getColumn()] = null;
+		daBoard[piece.getColumn()][piece.getRow()] = null;
 	}
-	public boolean isOccupied(int row, int column) { //checks whether a given square is occupied or not
-		if (daBoard[row][column] == null) {
+	public boolean isOccupied(int column, int row) { //checks whether a given square is occupied or not
+		if (daBoard[column][row] == null) {
 			return false;
 		}
 		else {
 			return true;
 		}
 	}
+	public Piece[][] getBoard() {
+		return daBoard;
+	}
+	
+	
 
 
 }
