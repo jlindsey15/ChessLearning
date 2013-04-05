@@ -3,8 +3,8 @@ public class Board {
 	private Piece[][] daBoard = new Piece[8][8]; //2D array representing the chessboard
 	public Board() { //creates a new chess board with all pieces in their starting positions
 		for (int i = 0; i < 8; i++) {
-			new Pawn(this, i, 1, false); //creates black pawns - far side
-			new Pawn(this, i, 6, true); //creates white pawns - near side
+			new Pawn(this, i, 1, true); //creates white pawns - near side
+			new Pawn(this, i, 6, false); //creates black pawns - far side
 		}
 		//white rooks:
 		new Rook(this, 0, 0, true);
@@ -38,6 +38,9 @@ public class Board {
 	}
 	public void remove(Piece piece) { //removes a Piece
 		daBoard[piece.getColumn()][piece.getRow()] = null;
+	}
+	public void remove(int column, int row) { //removes a Piece
+		daBoard[column][row] = null;
 	}
 	public boolean isOccupied(int column, int row) { //checks whether a given square is occupied or not
 		if (daBoard[column][row] == null) {

@@ -39,16 +39,45 @@ public abstract class Piece { //Superclass for all chess pieces
 	}
 	
 	public ArrayList<Position> removeFriendlyFire(ArrayList<Position> positions) {
+		ArrayList<Position> toBeRemoved = new ArrayList<Position>();
 		for (Position pos : positions) {
 			if (myBoard.getBoard()[pos.column][pos.row] == null) {
 				;
 			}
+			
 			else if (myBoard.getBoard()[pos.column][pos.row].isOnWhiteTeam == isOnWhiteTeam ) {
-				positions.remove(pos);
+				System.out.println("removing ff");
+				toBeRemoved.add(pos);
 			}
+			
+		}
+		for (Position posit : toBeRemoved) {
+			positions.remove(posit);
 		}
 		return positions;
 	}
-	public abstract ArrayList<Position> possiblesMoves();
+	
+	public ArrayList<ArrayList<Position>> ignoreAfterObstruction(ArrayList<ArrayList<Position>> meta) {
+		for (ArrayList<Position> line : meta) {
+			ArrayList<Position> toBeRemoved = new ArrayList<Position>();
+			boolean startIgnoring = false;
+			for (int i = 0; i < line.size(); i++) { //
+				if (startIgnoring) {
+					toBeRemoved.add(line.get(i));
+				}
+				else {
+					if (myBoard.isOccupied(line.get(i).column,  line.get(i).row)) {
+						startIgnoring = true;
+					}
+				}
+			}
+			for (Position removeThis : toBeRemoved) {
+				line.remove(removeThis);
+			}
+			
+		}
+		return meta;
+	}
+	public abstract ArrayList<Position> possibleMoves();
 
 }

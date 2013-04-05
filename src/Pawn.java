@@ -7,11 +7,23 @@ public class Pawn extends Piece {
 	public Pawn(Board board, int theColumn, int theRow, boolean whiteTeam) { //constructor
 		super(board, theColumn, theRow, whiteTeam);
 	}
-	public ArrayList<Position> possiblesMoves() {
+	public ArrayList<Position> possibleMoves() {
 		ArrayList<Position> returned = new ArrayList<Position>();
-		if (hasMoved) {
-			//returned.add(new Position(position.column, position.row))
+		int upOrDown;
+		if (isOnWhiteTeam) { //white pawns move up
+			upOrDown = 1;
 		}
+		else { //black pawns move down
+			upOrDown = -1;
+		}
+		if (hasMoved) {
+			returned.add(new Position(getColumn(), getRow() + upOrDown));
+		}
+		else {
+			returned.add(new Position(getColumn(), getRow() + 2 * upOrDown));
+		}
+		returned = removeFriendlyFire(returned); //removes friendly fire
+		return returned;
 	}
 
 }
