@@ -1,13 +1,14 @@
 import java.util.ArrayList;
 
 
-public class Bishop extends Piece{
+public class Bishop extends ChessPiece{
 	public Bishop(Board board, int theColumn, int theRow, boolean whiteTeam) { //constructor
 		super(board, theColumn, theRow, whiteTeam);
 	}
 	public ArrayList<Position> possibleMoves() { //possible moves for a bishop
 
 		ArrayList<Position> returned = new ArrayList<Position>();
+		//gives all the possible "lines" of movement
 		ArrayList<Position> rightUp = getPositionsInDirection(1, 1);
 		ArrayList<Position> leftUp = getPositionsInDirection(-1, 1);
 		ArrayList<Position> rightDown = getPositionsInDirection(1, -1);
@@ -17,7 +18,7 @@ public class Bishop extends Piece{
 		meta.add(leftUp);
 		meta.add(rightDown);
 		meta.add(leftDown);
-		meta = ignoreAfterObstruction(meta);
+		meta = ignoreAfterObstruction(meta); //can't move through a piece that's in the way  - remove those extra spaces at the end
 		for (ArrayList<Position> line : meta) {
 			returned.addAll(line);
 		}

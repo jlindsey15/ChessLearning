@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 
 
-public class Pawn extends Piece {
+public class Pawn extends ChessPiece {
 	public boolean hasMoved = false;
 
 	public Pawn(Board board, int theColumn, int theRow, boolean whiteTeam) { //constructor

@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 
 
-public class King extends Piece {
+public class King extends ChessPiece {
 	public King(Board board, int theColumn, int theRow, boolean whiteTeam) { //constructor
 		super(board, theColumn, theRow, whiteTeam);
 	}

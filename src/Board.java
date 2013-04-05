@@ -1,6 +1,6 @@
 
 public class Board {
-	private Piece[][] daBoard = new Piece[8][8]; //2D array representing the chessboard
+	private ChessPiece[][] daBoard = new ChessPiece[8][8]; //2D array representing the chessboard
 	public Board() { //creates a new chess board with all pieces in their starting positions
 		for (int i = 0; i < 8; i++) {
 			new Pawn(this, i, 1, true); //creates white pawns - near side
@@ -33,10 +33,10 @@ public class Board {
 		//black king:
 		new King(this, 4, 7, false);
 	}
-	public void add(Piece piece) { //adds a Piece - the location is contained within the piece object
+	public void add(ChessPiece piece) { //adds a Piece - the location is contained within the piece object
 		daBoard[piece.getColumn()][piece.getRow()] = piece;
 	}
-	public void remove(Piece piece) { //removes a Piece
+	public void remove(ChessPiece piece) { //removes a Piece
 		daBoard[piece.getColumn()][piece.getRow()] = null;
 	}
 	public void remove(int column, int row) { //removes a Piece
@@ -50,7 +50,7 @@ public class Board {
 			return true;
 		}
 	}
-	public Piece[][] getBoard() {
+	public ChessPiece[][] getBoard() {
 		return daBoard;
 	}
 	
