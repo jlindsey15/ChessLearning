@@ -2,8 +2,11 @@ import java.util.ArrayList;
 
 
 public class Rook extends ChessPiece {
-	public Rook(Board board, int theColumn, int theRow, boolean whiteTeam) { //constructor
-		super(board, theColumn, theRow, whiteTeam);
+	private static final String rookSpriteFilenameWhite = "ChessPiecesImages/RookWhite.png";;
+	private static final String rookSpriteFilenameNonWhite = "ChessPiecesImages/RookBlack.png";;
+	
+	public Rook(int theColumn, int theRow, boolean whiteTeam) { //constructor
+		super(theColumn, theRow, whiteTeam, (whiteTeam) ? rookSpriteFilenameWhite : rookSpriteFilenameNonWhite);
 	}
 	public ArrayList<Position> possibleMoves() {
 		ArrayList<Position> returned = new ArrayList<Position>();
@@ -21,7 +24,7 @@ public class Rook extends ChessPiece {
 		for (ArrayList<Position> line : meta) {
 			returned.addAll(line);
 		}
-		returned = removeFriendlyFire(returned);
+		returned = removeInvalid(returned);
 		return returned;
 	}
 

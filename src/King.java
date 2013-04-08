@@ -2,8 +2,11 @@ import java.util.ArrayList;
 
 
 public class King extends ChessPiece {
-	public King(Board board, int theColumn, int theRow, boolean whiteTeam) { //constructor
-		super(board, theColumn, theRow, whiteTeam);
+	private static final String kingSpriteFilenameWhite = "ChessPiecesImages/KingWhite.png";
+	private static final String kingSpriteFilenameNonWhite = "ChessPiecesImages/KingBlack.png";
+	
+	public King(int theColumn, int theRow, boolean whiteTeam) { //constructor
+		super(theColumn, theRow, whiteTeam, (whiteTeam) ? kingSpriteFilenameWhite : kingSpriteFilenameNonWhite);
 	}
 	public ArrayList<Position> possibleMoves() { //returns all possible moves for a king
 		ArrayList<Position> returned = new ArrayList<Position>();
@@ -20,7 +23,7 @@ public class King extends ChessPiece {
 				}
 			}
 		}
-		returned = removeFriendlyFire(returned); //removes friendly fire moves
+		returned = removeInvalid(returned); //removes friendly fire moves
 		
 		return returned;
 	}

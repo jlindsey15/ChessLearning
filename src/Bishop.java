@@ -2,8 +2,11 @@ import java.util.ArrayList;
 
 
 public class Bishop extends ChessPiece{
-	public Bishop(Board board, int theColumn, int theRow, boolean whiteTeam) { //constructor
-		super(board, theColumn, theRow, whiteTeam);
+	private static final String bishopSpriteFilenameWhite = "ChessPiecesImages/BishopWhite.png";;
+	private static final String bishopSpriteFilenameNonWhite = "ChessPiecesImages/BishopBlack.png";;
+	
+	public Bishop(int theColumn, int theRow, boolean whiteTeam) { //constructor
+		super(theColumn, theRow, whiteTeam, (whiteTeam) ? bishopSpriteFilenameWhite : bishopSpriteFilenameNonWhite);
 	}
 	public ArrayList<Position> possibleMoves() { //possible moves for a bishop
 
@@ -22,7 +25,7 @@ public class Bishop extends ChessPiece{
 		for (ArrayList<Position> line : meta) {
 			returned.addAll(line);
 		}
-		returned = removeFriendlyFire(returned);
+		returned = removeInvalid(returned);
 		return returned;
 
 

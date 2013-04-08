@@ -30,6 +30,7 @@ public class ChessApplication {
 		frame.pack();
 		frame.setVisible(true);
 	}
+
 	
 	/**
 	 * Creates the interface for the window, it constructs all of the UI elements into a hierarchy,
@@ -39,7 +40,7 @@ public class ChessApplication {
 	 * @param height - The height of the window
 	 * @return The panel which contains all of the UI elements
 	 */
-	private static JPanel CreateInterface(int width, int height) {
+	public static JPanel CreateInterface(int width, int height) {
 		//Create the contents panel
 		JPanel panel = new JPanel();
 		panel.setSize(width, height);
@@ -61,7 +62,7 @@ public class ChessApplication {
 	 * @param height - The height of the board in pixels
 	 */
 	private static void CreateChessBoard(JPanel panel, int width, int height, Color firstTileColor, Color secondTileColor) {
-		ChessBoard.Initialize();
+		//ChessBoard.Initialize();
 		panel.add(ChessBoard.GenerateChessBoard(width, height, firstTileColor, secondTileColor));
 	}
 }

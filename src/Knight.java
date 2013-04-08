@@ -2,8 +2,11 @@ import java.util.ArrayList;
 
 
 public class Knight extends ChessPiece {
-	public Knight(Board board, int theColumn, int theRow, boolean whiteTeam) { //constructor
-		super(board, theColumn, theRow, whiteTeam);
+	private static final String knightSpriteFilenameWhite = "ChessPiecesImages/KnightWhite.png";
+	private static final String knightSpriteFilenameNonWhite = "ChessPiecesImages/KnightBlack.png";
+	
+	public Knight(int theColumn, int theRow, boolean whiteTeam) { //constructor
+		super(theColumn, theRow, whiteTeam, (whiteTeam) ? knightSpriteFilenameWhite : knightSpriteFilenameNonWhite);
 	}
 	public ArrayList<Position> possibleMoves() { //all possible knight moves - this is how knights work...
 		ArrayList<Position> returned = new ArrayList<Position>();
@@ -42,7 +45,7 @@ public class Knight extends ChessPiece {
 		if (toBeAdded.isValid()) {
 			returned.add(toBeAdded);
 		}
-		returned = removeFriendlyFire(returned);
+		returned = removeInvalid(returned);
 		return returned;
 	}
 

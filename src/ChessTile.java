@@ -74,4 +74,8 @@ public class ChessTile {
 	public boolean isOccupied() {
 		return occupant == null;
 	}
+	
+	public void add(JPanel newPanel) {
+		this.panel.add(newPanel);
+	}
 }

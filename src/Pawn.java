@@ -2,10 +2,13 @@ import java.util.ArrayList;
 
 
 public class Pawn extends ChessPiece {
+	private static final String pawnSpriteFilenameWhite = "ChessPiecesImages/PawnWhite.png";
+	private static final String pawnSpriteFilenameNonWhite = "ChessPiecesImages/PawnBlack.png";
+	
 	public boolean hasMoved = false;
 
-	public Pawn(Board board, int theColumn, int theRow, boolean whiteTeam) { //constructor
-		super(board, theColumn, theRow, whiteTeam);
+	public Pawn(int theColumn, int theRow, boolean whiteTeam) { //constructor
+		super(theColumn, theRow, whiteTeam, (whiteTeam) ? pawnSpriteFilenameWhite : pawnSpriteFilenameNonWhite);
 	}
 	public ArrayList<Position> possibleMoves() {
 		ArrayList<Position> returned = new ArrayList<Position>();
@@ -22,7 +25,7 @@ public class Pawn extends ChessPiece {
 		else {
 			returned.add(new Position(getColumn(), getRow() + 2 * upOrDown));
 		}
-		returned = removeFriendlyFire(returned); //removes friendly fire
+		returned = removeInvalid(returned); //removes friendly fire
 		return returned;
 	}
 
