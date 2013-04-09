@@ -25,6 +25,7 @@ public class Rook extends ChessPiece {
 			returned.addAll(line);
 		}
 		returned = removeInvalid(returned);
+		//System.out.println("rook " + returned.size());
 		return returned;
 	}
 

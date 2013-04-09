@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import javax.swing.JPanel;
 
 public abstract class ChessPiece {
+	public Player player;
 	//The content panel
 	protected JPanel panel;
 	//The image view for the chess piece
@@ -73,6 +74,29 @@ public abstract class ChessPiece {
 	public void setPosition(Position pos) {
 		position = pos;
 	}
+	
+	public ArrayList<Position> removeDangerMoves(ArrayList<Position> moves) {
+		ArrayList<Position> returned = new ArrayList<Position>();
+		
+		
+		int oldColumn = this.getColumn();
+		int oldRow = this.getRow();
+		ArrayList<Position> toBeRemoved = new ArrayList<Position>();
+		for (Position pos : moves ) {
+			ChessPiece oldOccupant = ChessBoard.getBoard()[pos.column][pos.row];
+			ChessBoard.move(this, pos);
+			if (!this.player.opponent.opponentIsInCheck()) {
+				returned.add(pos);
+			}
+			ChessBoard.move(this, new Position(oldColumn, oldRow));
+			ChessBoard.setChessPiece(pos.column, pos.row, oldOccupant);
+			this.setPosition(new Position(oldColumn, oldRow));
+			
+			
+		}
+		return returned;
+	}
+	
 	public ArrayList<Position> getPositionsInDirection (int horiz, int vert) { 
 		//vert and horiz should be either -1, 0, or 1. For example (1, -1) would be diagonal down right since you increase the column number and decrease the row number
 																			
@@ -92,25 +116,26 @@ public abstract class ChessPiece {
 	}
 	
 	public ArrayList<Position> removeInvalid(ArrayList<Position> positions) {
-		ArrayList<Position> toBeRemoved = new ArrayList<Position>();
+		ArrayList<Position> returned = new ArrayList<Position>();
 		for (Position pos : positions) {
 			if (!pos.isValid()) {
-				toBeRemoved.add(pos);
+				;
 			}
 			else if (ChessBoard.getBoard()[pos.column][pos.row] == null) {
-				;
+				returned.add(pos);
 			}
 			
 			else if (((ChessPiece)ChessBoard.getBoard()[pos.column][pos.row]).isOnWhiteTeam == isOnWhiteTeam ) {
-				toBeRemoved.add(pos);
+				;
+			}
+			
+			else {
+				returned.add(pos);
 			}
 			
 			
 		}
-		for (Position posit : toBeRemoved) {
-			positions.remove(posit);
-		}
-		return positions;
+		return returned;
 	}
 	
 	public ArrayList<ArrayList<Position>> ignoreAfterObstruction(ArrayList<ArrayList<Position>> meta) {

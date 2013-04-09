@@ -39,7 +39,7 @@ public class ChessBoard {
 		new Knight(6, 7, false);
 		//white bishops:
 		new Bishop(2, 0, true);
-		new Bishop(5, 0, true);
+		new Knight(5, 0, true);
 		//black bishops:
 		new Bishop(2, 7, false);
 		new Bishop(5, 7, false);
@@ -85,7 +85,7 @@ public class ChessBoard {
 				boolean firstColor = ((x % 2 != 0 && y % 2 == 0) || (x % 2 == 0 && y % 2 != 0));
 				boolean secondColor = ((x % 2 == 0 && y % 2 == 0) || (x % 2 != 0 && y % 2 != 0));
 
-				System.out.println("Coordinate: (" + x + ", " + y + ") First Color: " + firstColor + " Second Color: " + secondColor);
+				//System.out.println("Coordinate: (" + x + ", " + y + ") First Color: " + firstColor + " Second Color: " + secondColor);
 
 				//Check to see the position of the tile and determine the color
 				if (x % 2 != 0 && y % 2 == 0) tiles[x][y].SetColor(firstTileColor);
@@ -135,7 +135,7 @@ public class ChessBoard {
 	public static void move(ChessPiece piece, Position pos) {
 		removeChessPiece(piece.getColumn(), piece.getRow());
 		setChessPiece(pos.column, pos.row, piece);
-		piece.setPosition(pos);
+		piece.setPosition(new Position(pos.column, pos.row));
 
 	}
 

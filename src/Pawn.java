@@ -4,7 +4,7 @@ import java.util.ArrayList;
 public class Pawn extends ChessPiece {
 	private static final String pawnSpriteFilenameWhite = "ChessPiecesImages/PawnWhite.png";
 	private static final String pawnSpriteFilenameNonWhite = "ChessPiecesImages/PawnBlack.png";
-	
+
 	public boolean hasMoved = false;
 
 	public Pawn(int theColumn, int theRow, boolean whiteTeam) { //constructor
@@ -19,13 +19,26 @@ public class Pawn extends ChessPiece {
 		else { //black pawns move down
 			upOrDown = -1;
 		}
-		if (hasMoved) {
+		
+		if (!hasMoved) { //forward 2
+			
+			if (!ChessBoard.isOccupied(getColumn(), getRow() + upOrDown)) {
+				returned.add(new Position(getColumn(), getRow() + 2 * upOrDown));
+			}
+		}
+		Position toBeAdded = new Position(getColumn(), getRow() + upOrDown);
+		if (toBeAdded.isValid() && !ChessBoard.isOccupied(getColumn(), getRow() + upOrDown)) { //space in front, unless occupied
 			returned.add(new Position(getColumn(), getRow() + upOrDown));
 		}
-		else {
-			returned.add(new Position(getColumn(), getRow() + 2 * upOrDown));
+		toBeAdded = new Position(getColumn() + 1, getRow() + upOrDown);
+		if (toBeAdded.isValid() && ChessBoard.isOccupied(getColumn() + 1, getRow() + upOrDown)) { //diagonal if occupied (ff's removed later)
+			returned.add(toBeAdded);
 		}
-		returned = removeInvalid(returned); //removes friendly fire
+		toBeAdded = new Position(getColumn() - 1, getRow() + upOrDown); 
+		if (toBeAdded.isValid() && ChessBoard.isOccupied(getColumn() - 1, getRow() + upOrDown)) { //same as above
+			returned.add(toBeAdded);
+		}
+		returned = removeInvalid(returned); //removes friendly fire and invalid spaces
 		return returned;
 	}
 
