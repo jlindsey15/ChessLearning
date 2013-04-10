@@ -81,7 +81,6 @@ public abstract class ChessPiece {
 		
 		int oldColumn = this.getColumn();
 		int oldRow = this.getRow();
-		ArrayList<Position> toBeRemoved = new ArrayList<Position>();
 		for (Position pos : moves ) {
 			ChessPiece oldOccupant = ChessBoard.getBoard()[pos.column][pos.row];
 			ChessBoard.move(this, pos);

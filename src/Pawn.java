@@ -22,7 +22,7 @@ public class Pawn extends ChessPiece {
 		
 		if (!hasMoved) { //forward 2
 			
-			if (!ChessBoard.isOccupied(getColumn(), getRow() + upOrDown)) {
+			if (!ChessBoard.isOccupied(getColumn(), getRow() + upOrDown) && !ChessBoard.isOccupied(getColumn(), getRow() + (2 * upOrDown))) {
 				returned.add(new Position(getColumn(), getRow() + 2 * upOrDown));
 			}
 		}

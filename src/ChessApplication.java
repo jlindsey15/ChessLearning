@@ -1,6 +1,5 @@
 import java.awt.Color;
 import java.awt.Dimension;
-
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
@@ -17,14 +16,14 @@ public class ChessApplication {
 	 */
 	public static void InitializeChessApplication(int width, int height) {
 		//Create the main window
-		if (frame != null) {
-			frame.setVisible(false);
-		}
 		frame = new JFrame("Chess Bot Application");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setResizable(false);
 		frame.setSize(width, height);
 		frame.setLocationRelativeTo(null);
+		
+		ChessMouseListener listener = new ChessMouseListener();
+		frame.addMouseListener(listener);
 		
 		//Add the UI to the window
 		frame.getContentPane().add(CreateInterface(width, height));
@@ -33,7 +32,6 @@ public class ChessApplication {
 		frame.pack();
 		frame.setVisible(true);
 	}
-
 	
 	/**
 	 * Creates the interface for the window, it constructs all of the UI elements into a hierarchy,
@@ -43,7 +41,7 @@ public class ChessApplication {
 	 * @param height - The height of the window
 	 * @return The panel which contains all of the UI elements
 	 */
-	public static JPanel CreateInterface(int width, int height) {
+	private static JPanel CreateInterface(int width, int height) {
 		//Create the contents panel
 		JPanel panel = new JPanel();
 		panel.setSize(width, height);
@@ -65,7 +63,13 @@ public class ChessApplication {
 	 * @param height - The height of the board in pixels
 	 */
 	private static void CreateChessBoard(JPanel panel, int width, int height, Color firstTileColor, Color secondTileColor) {
-		//ChessBoard.Initialize();
+		ChessBoard.Initialize();
+		ChessGame.InitializeGame();
 		panel.add(ChessBoard.GenerateChessBoard(width, height, firstTileColor, secondTileColor));
+	}
+	
+	public static void UpdateDisplay() {
+		frame.repaint();
+		frame.getContentPane().repaint();
 	}
 }

@@ -32,8 +32,10 @@ public class Player {
 		if (!opponentIsInCheck()) { //opponent must currently be in check to achieve checkmate (but not for stalemate...)
 			return false;
 		}
+		
 		else {
 			for (ChessPiece oppPiece : opponent.getMyTeam()) {
+
 				for (Position movePosition : oppPiece.possibleMoves()) { //simmulate all possible opponent moves
 					//used to restore the board back to original state after "preview" of opponent move
 					ChessPiece[][] oldBoard = new ChessPiece[8][8];
@@ -45,16 +47,22 @@ public class Player {
 					}
 					int oldColumn = oppPiece.getColumn();
 					int oldRow = oppPiece.getRow();
-					ChessBoard.move(oppPiece,  movePosition);
-					if (!opponentIsInCheck()) {//this means there's a way for the opponent to get out of check, so the game's not over
-						System.out.println("Not mate!");
-						ChessBoard.setBoard(oldBoard);
+					ChessPiece oldOccupant = ChessBoard.getBoard()[movePosition.column][movePosition.row];
+					ChessBoard.move(oppPiece, movePosition);
+					if (!opponentIsInCheck()) {//this means there's a way for the opponent to not move into check, so the game's not a stale mate
+						ChessBoard.move(oppPiece,  new Position(oldColumn, oldRow));
+						ChessBoard.setChessPiece(movePosition.column,  movePosition.row,  oldOccupant);
+						//ChessBoard.setBoard(oldBoard);
 						oppPiece.setPosition(new Position(oldColumn, oldRow));
 						return false; 
 
 					}
 					else {
-						ChessBoard.setBoard(oldBoard);
+						ChessBoard.move(oppPiece,  new Position(oldColumn, oldRow));
+						ChessBoard.setChessPiece(movePosition.column,  movePosition.row,  oldOccupant);
+						//ChessBoard.setBoard(oldBoard);
+						oppPiece.setPosition(new Position(oldColumn, oldRow));
+						//ChessBoard.setBoard(oldBoard);
 						oppPiece.setPosition(new Position(oldColumn, oldRow));//restores board back to old state before simulation
 					}
 
@@ -66,7 +74,6 @@ public class Player {
 
 	public boolean hasStaleMate() { //TODO: other stalemate rules (like 3 same in a row, 50 move rule, etc.)
 		//checks if the player has won the game 
-
 		if (opponentIsInCheck()) { //opponent must NOT currently be in check to achieve STALEMATE
 			return false;
 		}
@@ -83,21 +90,26 @@ public class Player {
 					}
 					int oldColumn = oppPiece.getColumn();
 					int oldRow = oppPiece.getRow();
+					ChessPiece oldOccupant = ChessBoard.getBoard()[movePosition.column][movePosition.row];
 					ChessBoard.move(oppPiece, movePosition);
 					if (!opponentIsInCheck()) {//this means there's a way for the opponent to not move into check, so the game's not a stale mate
-						ChessBoard.setBoard(oldBoard);
+						ChessBoard.move(oppPiece,  new Position(oldColumn, oldRow));
+						ChessBoard.setChessPiece(movePosition.column,  movePosition.row,  oldOccupant);
 						oppPiece.setPosition(new Position(oldColumn, oldRow));
 						return false; 
 
 					}
 					else {
-						ChessBoard.setBoard(oldBoard);
+						ChessBoard.move(oppPiece,  new Position(oldColumn, oldRow));
+						ChessBoard.setChessPiece(movePosition.column,  movePosition.row,  oldOccupant);
+						oppPiece.setPosition(new Position(oldColumn, oldRow));
 						oppPiece.setPosition(new Position(oldColumn, oldRow));//restores board back to old state before simulation
 					}
 
 				}
 			}
 		}
+		
 		return true; //if there's no escape, return true
 	}
 
@@ -114,17 +126,21 @@ public class Player {
 			for (Position movePosition : piece.possibleMoves()) {
 				int oldColumn = piece.getColumn();
 				int oldRow = piece.getRow();
+				ChessPiece oldOccupant = ChessBoard.getBoard()[movePosition.column][movePosition.row];
 				ChessBoard.move(piece, movePosition);
 				
 				if (opponent.getKing() == null) { //if one of your pieces could attack opponent's King
-					ChessBoard.setBoard(oldBoard);
+					ChessBoard.move(piece, new Position(oldColumn, oldRow));
+					ChessBoard.setChessPiece(movePosition.column,  movePosition.row,  oldOccupant);
 					piece.setPosition(new Position(oldColumn, oldRow));
 					return true;
 				}
+				ChessBoard.move(piece, new Position(oldColumn, oldRow));
+				ChessBoard.setChessPiece(movePosition.column,  movePosition.row,  oldOccupant);
 				piece.setPosition(new Position(oldColumn, oldRow));
 			}
 		}
-		ChessBoard.setBoard(oldBoard);
+		
 		return false; //if no possible ways to attack opponent king, then he is not in check
 	}
 

@@ -9,6 +9,9 @@ public class ChessTile {
 	private int width;
 	private int height;
 	
+	private Color color;
+	private boolean highlighted = false;
+	
 	private ChessPiece occupant = null;
 	
 	/**
@@ -56,7 +59,10 @@ public class ChessTile {
 	 * @param piece - The piece to set the tile too
 	 */
 	public void setOccupant(ChessPiece piece) {		
-		this.occupant = piece;
+		try {
+			this.occupant = piece;		
+			if (piece.getPanel() != null) this.panel.add(piece.getPanel());
+		} catch (NullPointerException ex) {}
 	}
 	
 	public ChessPiece getOccupant() {
@@ -64,11 +70,15 @@ public class ChessTile {
 	}
 	
 	public void removeOccupant() {
-		this.occupant = null;
+		try {
+			this.panel.remove(occupant.getPanel());
+			this.occupant = null;
+		} catch (NullPointerException ex) {}
 	}
 	
 	public void SetColor(Color color) {
-		panel.setBackground(color);
+		this.color = color;
+		panel.setBackground(this.color);
 	}
 	
 	public boolean isOccupied() {
@@ -77,5 +87,16 @@ public class ChessTile {
 	
 	public void add(JPanel newPanel) {
 		this.panel.add(newPanel);
+	}
+	
+	public Color getColor() {
+		return this.color;
+	}
+	
+	public void setHighlighted(boolean flag) {
+		highlighted = flag;
+		
+		if (this.highlighted) panel.setBackground(Color.RED);
+		else panel.setBackground(this.color);
 	}
 }
