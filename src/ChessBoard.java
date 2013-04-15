@@ -10,11 +10,11 @@ public class ChessBoard {
 	//The tiles array
 	public static ChessTile[][] tiles;
 	public static ChessPiece[][] pieces;
-	
+
 	//The currently selected piece
 	private static ChessPiece currentlySelectedPiece = null;
 	private static ArrayList<Position> currentMoves = new ArrayList<Position>();
-	
+
 	/**
 	 * Initializes the chess board and the array of the tiles
 	 */
@@ -22,16 +22,16 @@ public class ChessBoard {
 		//Allocate the array of tiles
 		tiles = new ChessTile[8][8];
 		pieces = new ChessPiece[8][8];
-		
+
 		for (int x = 0; x < 8; x++) {
 			for (int y = 0; y < 8; y++) {
 				tiles[x][y] = new ChessTile(100, 100);
 			}
 		}
-		
+
 		InitializeChessPieces();
 	}
-	
+
 	private static void InitializeChessPieces() {
 		for (int i = 0; i < 8; i++) {
 			new Pawn(i, 1, true); //creates white pawns - near side
@@ -64,7 +64,7 @@ public class ChessBoard {
 		//black king:
 		new King(4, 7, false);
 	}
-	
+
 	/**
 	 * Generates the initial chess board layout
 	 * 
@@ -78,28 +78,28 @@ public class ChessBoard {
 		JPanel contentPanel = new JPanel();
 		contentPanel.setSize(width, height);
 		contentPanel.setPreferredSize(new Dimension(width, height));
-						
+
 		//Create the grid layout manager to make tile placement easier
 		GridLayout layout = new GridLayout(0, 8);
 		layout.setHgap(2);
 		layout.setVgap(2);
-		
+
 		contentPanel.setLayout(layout);
-		
+
 		//Make all the tiles
 		for (int y = 0; y < 8; ++y) {
 			for (int x = 0; x < 8; ++x) {				
 				boolean firstColor = ((x % 2 != 0 && y % 2 == 0) || (x % 2 == 0 && y % 2 != 0));
 				boolean secondColor = ((x % 2 == 0 && y % 2 == 0) || (x % 2 != 0 && y % 2 != 0));
-				
+
 				System.out.println("Coordinate: (" + x + ", " + y + ") First Color: " + firstColor + " Second Color: " + secondColor);
-					
+
 				//Check to see the position of the tile and determine the color
 				if (x % 2 != 0 && y % 2 == 0) tiles[x][y].SetColor(firstTileColor);
 				else if (x % 2 == 0 && y % 2 != 0) tiles[x][y].SetColor(firstTileColor);
 				else if (x % 2 == 0 && y % 2 == 0) tiles[x][y].SetColor(secondTileColor);
 				else if (x % 2 != 0 && y % 2 != 0) tiles[x][y].SetColor(secondTileColor);
-							
+
 				//Add the tile to the panel
 				if (pieces[x][y] != null) {
 					tiles[x][y].setOccupant(pieces[x][y]);
@@ -108,10 +108,10 @@ public class ChessBoard {
 				contentPanel.add(tiles[x][y].getPanel());
 			}
 		}
-		
+
 		return contentPanel;
 	}
-	
+
 	/**
 	 * Resets the selection UI. Handles removing the highlights on the board. 
 	 * Removes the currently selected piece. Clears all the moves
@@ -120,7 +120,7 @@ public class ChessBoard {
 		//Clear all the moves and the current piece selected
 		currentMoves.clear();
 		currentlySelectedPiece = null;
-		
+
 		//Clear all the highlights
 		for (int x = 0; x < 8; ++x) {
 			for (int y = 0; y < 8; ++y) {
@@ -128,7 +128,7 @@ public class ChessBoard {
 			}
 		}
 	}
-	
+
 	/**
 	 * Called from the mouse event pressed. Handles the selection of a tile. Determines whether clicking to move a piece, 
 	 * to select a piece, or whether it is a wrong click.
@@ -143,35 +143,36 @@ public class ChessBoard {
 			AttemptMove(row, column);
 			return;
 		}
-		
+
 		//Check to see if a piece is selected and there are no moves to do
 		if (currentlySelectedPiece != null && currentMoves.isEmpty()) {
 			ResetSelection();
 		}
-		
+
 		//Check to see if just clicking in a random space
 		if (pieces[row][column] == null && currentMoves.isEmpty()) {
 			return;
 		}
-		
+
 		//Check to see whether or not selection has been made
 		if (currentlySelectedPiece == null) {
 			if (pieces[row][column].isOnWhiteTeam != onWhite) return;
-			
+
 			//Set the current piece and the current moves
 			currentlySelectedPiece = pieces[row][column];
-			currentMoves = currentlySelectedPiece.possibleMoves();
-			
+			System.out.println("test ccsntiaccity " + currentlySelectedPiece);
+			currentMoves = currentlySelectedPiece.removeDangerMoves(currentlySelectedPiece.possibleMoves());
+
 			//Highlight the selection tile
 			tiles[row][column].setHighlighted(true);
-			
+
 			//Go through all the possible positions and highlight them
 			for (Position pos : currentMoves) {
 				tiles[pos.column][pos.row].setHighlighted(true);
 			}
 		}		
 	}
-	
+
 	/**
 	 * Function which moves and handles the pieces. Handles checking if it is a valid move and
 	 * handles removing the old piece and adding the new piece
@@ -181,7 +182,7 @@ public class ChessBoard {
 	 */
 	private static void AttemptMove(int column, int row) {		
 		boolean validMove = false;
-		
+
 		//Go through all the current valid moves for the current piece
 		for (Position pos : currentMoves) {		
 			//We have the correct move clicked
@@ -189,22 +190,35 @@ public class ChessBoard {
 				validMove = true;
 			}
 		}
-		
+
 		//If we clicked a valid move then move the piece to that place
 		if (validMove) {
 			if (currentlySelectedPiece instanceof Pawn) {
 				((Pawn) currentlySelectedPiece).hasMoved = true;
+
 			}
-			
+
 			move(currentlySelectedPiece, new Position(column, row));
-			
+			if (currentlySelectedPiece instanceof Pawn) {
+				if ((currentlySelectedPiece.isOnWhiteTeam && row == 7) || (!currentlySelectedPiece.isOnWhiteTeam && row == 0)) {
+					System.out.println("CHANGE");
+					//ChessBoard.removeChessPiece(column, row);
+					Queen queen = new Queen(column, row, currentlySelectedPiece.isOnWhiteTeam);
+					queen.player = ChessGame.currentPlayer;
+					queen.LoadImage();
+					ChessBoard.setChessPiece(column,  row,  queen);
+					System.out.println("test city " + tiles[column][row].getOccupant());
+
+				}
+			}
+
 			ChessGame.UpdateGame();
 		}
-		
+
 		//Reset all of the UI for selection
 		ResetSelection();
 	}
-	
+
 	public static void SetProperPiecePositions() {
 		for (int y = 0; y < 8; y++) {
 			for (int x = 0; x < 8; x++) {
@@ -212,7 +226,7 @@ public class ChessBoard {
 			}
 		}
 	}
-	
+
 	/**
 	 * Sets the chess piece for the position. 
 	 * 
@@ -226,14 +240,14 @@ public class ChessBoard {
 		tiles[x][y].removeOccupant();
 		tiles[x][y].setOccupant(pieces[x][y]);
 	}
-	
+
 	public static ChessPiece removeChessPiece(int x, int y) {		
 		ChessPiece piece = pieces[x][y];
 		pieces[x][y] = null;
 		tiles[x][y].removeOccupant();
 		return piece;
 	}
-	
+
 	public static ChessPiece removeChessPiece(ChessPiece piece) {
 		return removeChessPiece(piece.getColumn(), piece.getRow());
 	}
@@ -245,18 +259,23 @@ public class ChessBoard {
 	public static boolean isOccupied(int column, int row) {
 		return pieces[column][row] != null;
 	}
-	
+
 	public static void move(ChessPiece piece, Position pos) {
+		
 		try {
 			removeChessPiece(piece.getColumn(), piece.getRow());
 			setChessPiece(pos.column, pos.row, piece);
 			piece.setPosition(new Position(pos.column, pos.row));
+			
 		} catch (NullPointerException ex) {}
 	}
-	
+
+
+
+
 	public static void setBoard(ChessPiece[][] board) {
 		pieces = board;
-		
+
 		for (int x = 0; x < 8; ++x) {
 			for (int y = 0; y < 8; ++y) {
 				move(pieces[x][y], new Position(x, y));

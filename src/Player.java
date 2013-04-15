@@ -2,6 +2,12 @@ import java.util.ArrayList;
 
 
 public class Player {
+	private static final int PAWN_WEIGHT = 1;
+	private static final int ROOK_WEIGHT = 3;
+	private static final int BISHOP_WEIGHT = 5;
+	private static final int KNIGHT_WEIGHT = 7;
+	private static final int QUEEN_WEIGHT = 9;
+	private static final int KING_WEIGHT = 200000000;
 	public boolean isOnWhiteTeam;
 	public Player opponent;
 	public Player() { //default constructor
@@ -32,7 +38,7 @@ public class Player {
 		if (!opponentIsInCheck()) { //opponent must currently be in check to achieve checkmate (but not for stalemate...)
 			return false;
 		}
-		
+
 		else {
 			for (ChessPiece oppPiece : opponent.getMyTeam()) {
 
@@ -53,7 +59,7 @@ public class Player {
 						ChessBoard.move(oppPiece,  new Position(oldColumn, oldRow));
 						ChessBoard.setChessPiece(movePosition.column,  movePosition.row,  oldOccupant);
 						//ChessBoard.setBoard(oldBoard);
-						oppPiece.setPosition(new Position(oldColumn, oldRow));
+						//oppPiece.setPosition(new Position(oldColumn, oldRow));
 						return false; 
 
 					}
@@ -61,9 +67,9 @@ public class Player {
 						ChessBoard.move(oppPiece,  new Position(oldColumn, oldRow));
 						ChessBoard.setChessPiece(movePosition.column,  movePosition.row,  oldOccupant);
 						//ChessBoard.setBoard(oldBoard);
-						oppPiece.setPosition(new Position(oldColumn, oldRow));
+						//oppPiece.setPosition(new Position(oldColumn, oldRow));
 						//ChessBoard.setBoard(oldBoard);
-						oppPiece.setPosition(new Position(oldColumn, oldRow));//restores board back to old state before simulation
+						//oppPiece.setPosition(new Position(oldColumn, oldRow));//restores board back to old state before simulation
 					}
 
 				}
@@ -95,21 +101,21 @@ public class Player {
 					if (!opponentIsInCheck()) {//this means there's a way for the opponent to not move into check, so the game's not a stale mate
 						ChessBoard.move(oppPiece,  new Position(oldColumn, oldRow));
 						ChessBoard.setChessPiece(movePosition.column,  movePosition.row,  oldOccupant);
-						oppPiece.setPosition(new Position(oldColumn, oldRow));
+						//oppPiece.setPosition(new Position(oldColumn, oldRow));
 						return false; 
 
 					}
 					else {
 						ChessBoard.move(oppPiece,  new Position(oldColumn, oldRow));
 						ChessBoard.setChessPiece(movePosition.column,  movePosition.row,  oldOccupant);
-						oppPiece.setPosition(new Position(oldColumn, oldRow));
-						oppPiece.setPosition(new Position(oldColumn, oldRow));//restores board back to old state before simulation
+						//oppPiece.setPosition(new Position(oldColumn, oldRow));
+						//oppPiece.setPosition(new Position(oldColumn, oldRow));//restores board back to old state before simulation
 					}
 
 				}
 			}
 		}
-		
+
 		return true; //if there's no escape, return true
 	}
 
@@ -122,13 +128,13 @@ public class Player {
 			}
 		}
 		for (ChessPiece piece : getMyTeam()) {
-			
+
 			for (Position movePosition : piece.possibleMoves()) {
 				int oldColumn = piece.getColumn();
 				int oldRow = piece.getRow();
 				ChessPiece oldOccupant = ChessBoard.getBoard()[movePosition.column][movePosition.row];
 				ChessBoard.move(piece, movePosition);
-				
+
 				if (opponent.getKing() == null) { //if one of your pieces could attack opponent's King
 					ChessBoard.move(piece, new Position(oldColumn, oldRow));
 					ChessBoard.setChessPiece(movePosition.column,  movePosition.row,  oldOccupant);
@@ -137,10 +143,10 @@ public class Player {
 				}
 				ChessBoard.move(piece, new Position(oldColumn, oldRow));
 				ChessBoard.setChessPiece(movePosition.column,  movePosition.row,  oldOccupant);
-				piece.setPosition(new Position(oldColumn, oldRow));
+				//piece.setPosition(new Position(oldColumn, oldRow));
 			}
 		}
-		
+
 		return false; //if no possible ways to attack opponent king, then he is not in check
 	}
 
@@ -167,6 +173,57 @@ public class Player {
 			}
 		}
 		return null; //should never get here
+	}
+
+	public static int evaluateBoard(ChessPiece board[][], Player player) {
+		int rank = 0;
+
+		ArrayList<Pawn> compPawns = new ArrayList<Pawn>();
+		ArrayList<Pawn> playerPawns = new ArrayList<Pawn>();
+
+		ArrayList<Bishop> compBishops = new ArrayList<Bishop>();
+		ArrayList<Bishop> playerBishops = new ArrayList<Bishop>();
+
+		ArrayList<Knight> compKnights = new ArrayList<Knight>();
+		ArrayList<Knight> playerKnights = new ArrayList<Knight>();
+
+		ArrayList<Rook> compRooks = new ArrayList<Rook>();
+		ArrayList<Rook> playerRooks = new ArrayList<Rook>();
+
+		int playerQueenCount = 0;
+		int compQueenCount = 0;
+
+		int playerKingCount = 0;
+		int compKingCount = 0;
+
+		for (ChessPiece piece : player.opponent.getMyTeam()) {
+			if (piece instanceof Pawn) playerPawns.add((Pawn) piece);
+			if (piece instanceof Bishop) playerBishops.add((Bishop) piece);
+			if (piece instanceof Knight) playerKnights.add((Knight) piece);
+			if (piece instanceof Rook) playerRooks.add((Rook) piece);
+			if (piece instanceof Queen) playerQueenCount = 1;
+			if (piece instanceof King) playerKingCount = 1;
+		}
+
+		for (ChessPiece piece : player.getMyTeam()) {
+			if (piece instanceof Pawn) compPawns.add((Pawn) piece);
+			if (piece instanceof Bishop) compBishops.add((Bishop) piece);
+			if (piece instanceof Knight) compKnights.add((Knight) piece);
+			if (piece instanceof Rook) compRooks.add((Rook) piece);
+			if (piece instanceof Queen) compQueenCount = 1;
+			if (piece instanceof King) compKingCount = 1;
+		}
+
+		rank = KING_WEIGHT * (compKingCount - playerKingCount)
+				+ QUEEN_WEIGHT * (compQueenCount - playerQueenCount)
+				+ ROOK_WEIGHT * (compRooks.size() - playerRooks.size())
+				+ BISHOP_WEIGHT * (compBishops.size() - playerBishops.size())
+				+ KNIGHT_WEIGHT * (compKnights.size() - playerKnights.size())
+				+ PAWN_WEIGHT * (compPawns.size() - playerPawns.size());
+
+
+		return rank;
+
 	}
 
 

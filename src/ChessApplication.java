@@ -6,6 +6,7 @@ import javax.swing.JPanel;
 public class ChessApplication {
 	//The window object
 	private static JFrame frame;
+	public static JPanel thePanel;
 	
 	/**
 	 * Initializes the window. It also constructs the window and sets all the proper properties. It then adds
@@ -50,7 +51,7 @@ public class ChessApplication {
 		
 		//Create the chess board
 		CreateChessBoard(panel, width, height, Color.WHITE, Color.BLACK);
-		
+		thePanel = panel;
 		return panel;
 	}
 	
@@ -69,6 +70,8 @@ public class ChessApplication {
 	}
 	
 	public static void UpdateDisplay() {
+		
+		
 		frame.repaint();
 		frame.getContentPane().repaint();
 	}
