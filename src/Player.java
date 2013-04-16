@@ -3,9 +3,9 @@ import java.util.ArrayList;
 
 public class Player {
 	private static final int PAWN_WEIGHT = 1;
-	private static final int ROOK_WEIGHT = 3;
-	private static final int BISHOP_WEIGHT = 5;
-	private static final int KNIGHT_WEIGHT = 7;
+	private static final int ROOK_WEIGHT = 5;
+	private static final int BISHOP_WEIGHT = 3;
+	private static final int KNIGHT_WEIGHT = 3;
 	private static final int QUEEN_WEIGHT = 9;
 	private static final int KING_WEIGHT = 200000000;
 	public boolean isOnWhiteTeam;
@@ -221,7 +221,7 @@ public class Player {
 				+ KNIGHT_WEIGHT * (compKnights.size() - playerKnights.size())
 				+ PAWN_WEIGHT * (compPawns.size() - playerPawns.size());
 
-
+		//System.out.println("rank: " + rank);
 		return rank;
 
 	}

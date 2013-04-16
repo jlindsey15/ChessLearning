@@ -234,6 +234,14 @@ public class ChessBoard {
 	 * @param y - The y coordinate for the chess piece (board coordinates 1 - 8)
 	 * @param piece - The piece to set to the position
 	 */
+	public static void printBoard() {
+		for (int i = 0; i < 8; i++) {
+			for (int j = 0; j < 8; j++) {
+				System.out.print(getBoard()[j][i] + "  ");
+			}
+			System.out.println();
+		}
+	}
 	public static void setChessPiece(int x, int y, ChessPiece piece) {
 		//Set the occupant for that position
 		pieces[x][y] = piece;
