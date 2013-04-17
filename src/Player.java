@@ -2,23 +2,57 @@ import java.util.ArrayList;
 
 
 public class Player {
-	private static final int PAWN_WEIGHT = 1;
-	private static final int ROOK_WEIGHT = 5;
-	private static final int BISHOP_WEIGHT = 3;
-	private static final int KNIGHT_WEIGHT = 3;
-	private static final int QUEEN_WEIGHT = 9;
+	private static final int PAWN_WEIGHT = 2;
+	private static final int ROOK_WEIGHT = 9;
+	private static final int BISHOP_WEIGHT = 6;
+	private static final int KNIGHT_WEIGHT = 6;
+	private static final int QUEEN_WEIGHT = 18;
 	private static final int KING_WEIGHT = 200000000;
+	private static final int ROOK_ON_SEVEN_BONUS = 5;
+	private static final int ROOK_ALONE_BONUS = 5;
+	private static final int PAWN_ISOLATION_PENALTY = -5;
+
 	public boolean isOnWhiteTeam;
 	public Player opponent;
 	public Player() { //default constructor
 		;
 	}
+	public  ArrayList<Rook> myRooks = new ArrayList<Rook>();
+	public  ArrayList<Pawn> myPawns = new ArrayList<Pawn>();
+	public  ArrayList<Bishop> myBishops = new ArrayList<Bishop>();
+	public  ArrayList<Queen> myQueens = new ArrayList<Queen>();
+	public  ArrayList<King> myKings = new ArrayList<King>();
+	public ArrayList<Knight> myKnights = new ArrayList<Knight>();
 	public Player(boolean whiteTeam) {
 		isOnWhiteTeam = whiteTeam;
 		for (ChessPiece piece : getMyTeam()) {
+			if (piece instanceof Pawn) myPawns.add((Pawn)piece);
+			if (piece instanceof Rook) myRooks.add((Rook)piece);
+			if (piece instanceof Bishop) myBishops.add((Bishop)piece);
+			if (piece instanceof Knight) myKnights.add((Knight)piece);
+			if (piece instanceof King) myKings.add((King)piece);
+			if (piece instanceof Queen) myQueens.add((Queen)piece);
 			piece.player = this;
 		}
 
+
+	}
+	public void refreshArrayLists() {
+		myPawns.clear();
+		myRooks.clear();
+		myBishops.clear();
+		myKnights.clear();
+		myQueens.clear();
+		myKings.clear();
+		for (ChessPiece piece : getMyTeam()) {
+			if (piece instanceof Pawn) myPawns.add((Pawn)piece);
+			if (piece instanceof Rook) myRooks.add((Rook)piece);
+			if (piece instanceof Bishop) myBishops.add((Bishop)piece);
+			if (piece instanceof Knight) myKnights.add((Knight)piece);
+			if (piece instanceof King) myKings.add((King)piece);
+			if (piece instanceof Queen) myQueens.add((Queen)piece);
+			piece.player = this;
+		}
 
 	}
 	public void setOpponent(Player opp) {
@@ -26,11 +60,22 @@ public class Player {
 	}
 	public void makeMove(ChessPiece piece, Position pos) {
 		if (piece.isOnWhiteTeam == isOnWhiteTeam) {
+
 			ChessBoard.move(piece, pos);
 			if (piece instanceof Pawn) {
 				((Pawn) piece).hasMoved = true;
 			}
 		}
+
+	}
+	public void restore(ChessPiece piece) {
+		ChessPiece thing = piece;
+		if (thing instanceof Pawn) myPawns.add((Pawn)thing);
+		else if (thing instanceof Knight) myKnights.add((Knight)thing);
+		else if (thing instanceof Rook) myRooks.add((Rook)thing);
+		else if (thing instanceof Queen) myQueens.add((Queen)thing);
+		else if (thing instanceof King) myKings.add((King)thing);
+		else if (thing instanceof Bishop) myBishops.add((Bishop)thing);
 
 	}
 
@@ -135,7 +180,7 @@ public class Player {
 				ChessPiece oldOccupant = ChessBoard.getBoard()[movePosition.column][movePosition.row];
 				ChessBoard.move(piece, movePosition);
 
-				if (opponent.getKing() == null) { //if one of your pieces could attack opponent's King
+				if (opponent.myKings.size() == 0) { //if one of your pieces could attack opponent's King
 					ChessBoard.move(piece, new Position(oldColumn, oldRow));
 					ChessBoard.setChessPiece(movePosition.column,  movePosition.row,  oldOccupant);
 					piece.setPosition(new Position(oldColumn, oldRow));
@@ -167,63 +212,136 @@ public class Player {
 		return returned;
 	}
 	public King getKing() {
-		for (ChessPiece piece : getMyTeam()) {
-			if (piece instanceof King) {
-				return (King) piece;
+		return myKings.get(0);
+	}
+
+	public static int evaluateMaterial(ChessPiece board[][], Player player) {
+		int rank = 0;
+
+		rank = KING_WEIGHT * (player.myKings.size() - player.opponent.myKings.size())
+				+ QUEEN_WEIGHT * (player.myQueens.size() - player.opponent.myQueens.size())
+				+ ROOK_WEIGHT * (player.myRooks.size() - player.opponent.myRooks.size())
+				+ BISHOP_WEIGHT * (player.myBishops.size() - player.opponent.myBishops.size())
+				+ KNIGHT_WEIGHT * (player.myKnights.size() - player.opponent.myKnights.size())
+				+ PAWN_WEIGHT * (player.myPawns.size() - player.opponent.myPawns.size());
+
+		System.out.println("rank: " + rank + " queensize " + (player.myQueens.size()) + " opponent queensize " + player.opponent.myQueens.size());
+		return rank;
+
+	}
+	public static int evaluateMobility(ChessPiece board[][], Player player) {
+		int counter = 0;
+		for (ChessPiece piece : player.getMyTeam()) {
+			ArrayList<Position> moves = piece.removeDangerMoves(piece.possibleMoves());
+			counter += moves.size();
+		}
+		for (ChessPiece piece : player.opponent.getMyTeam()) {
+			ArrayList<Position> moves = piece.removeDangerMoves(piece.possibleMoves());
+			counter -= moves.size();
+		}
+		return counter;
+	}
+
+	public static int evaluateRookBonus(ChessPiece board[][], Player player) {
+		int count = 0;
+		for (Rook rook : player.myRooks) {
+			if (rook.getRow() == 6) {
+				count += ROOK_ON_SEVEN_BONUS;
+			}
+
+		}
+		for (Rook rook : player.opponent.myRooks) {
+			if (rook.getRow() == 1) {
+				count -= ROOK_ON_SEVEN_BONUS;
 			}
 		}
-		return null; //should never get here
+		if (!player.isOnWhiteTeam) {
+			count = -count;
+		}
+		int aloneBonus = ROOK_ALONE_BONUS;
+		for (Rook rook : player.myRooks) {
+			int column = rook.getColumn();
+			for (int i = 0; i < 8; i ++) {
+				if (ChessBoard.getBoard()[column][i] != null) {
+					aloneBonus = 0;
+				}
+			}
+			count += aloneBonus;
+		}
+		System.out.println("Rook bonus " + count);
+		return count;
+
+	}
+
+	public static int evaluatePawnBonus(ChessPiece board[][], Player player) { //penalties for isolated or "backwards" pawns
+		int count = 0;
+
+
+
+		for (Pawn pawn : player.myPawns) {
+			int column = pawn.getColumn();
+			int left = column - 1;
+			int right = column + 1;
+
+			if (0 <= left && left < 8) {
+				int bonus = PAWN_ISOLATION_PENALTY;
+				for (int i = 0; player.isOnWhiteTeam? (i <= pawn.getRow()) : (i >= pawn.getRow()); i ++) {
+					if (ChessBoard.getBoard()[left][i] instanceof Pawn && ChessBoard.getBoard()[left][i].isOnWhiteTeam == player.isOnWhiteTeam) {
+						bonus = 0;
+						break;
+					}
+				}
+				count += bonus;
+			}
+
+			if (0 <= right && right < 8) {
+				int bonus = PAWN_ISOLATION_PENALTY;
+				for (int i = 0; i < 8; i ++) {
+					if (ChessBoard.getBoard()[right][i] instanceof Pawn && ChessBoard.getBoard()[right][i].isOnWhiteTeam == player.isOnWhiteTeam) {
+						bonus = 0;
+						break;
+					}
+				}
+				count += bonus;
+			}
+			
+
+		}
+		for (Pawn pawn : player.opponent.myPawns) {
+			int column = pawn.getColumn();
+			int left = column - 1;
+			int right = column + 1;
+
+			if (0 <= left && left < 8) {
+				int bonus = PAWN_ISOLATION_PENALTY;
+				for (int i = 0; player.opponent.isOnWhiteTeam? (i <= pawn.getRow()) : (i >= pawn.getRow()); i ++) {
+					if (ChessBoard.getBoard()[left][i] instanceof Pawn && ChessBoard.getBoard()[left][i].isOnWhiteTeam == player.opponent.isOnWhiteTeam) {
+						bonus = 0;
+						break;
+					}
+				}
+				count -= bonus;
+			}
+
+			if (0 <= right && right < 8) {
+				int bonus = PAWN_ISOLATION_PENALTY;
+				for (int i = 0; i < 8; i ++) {
+					if (ChessBoard.getBoard()[right][i] instanceof Pawn && ChessBoard.getBoard()[right][i].isOnWhiteTeam == player.opponent.isOnWhiteTeam) {
+						bonus = 0;
+						break;
+					}
+				}
+				count -= bonus;
+			}
+			
+
+		}
+		System.out.println("PAWN BONUS " + count);
+		return count;
 	}
 
 	public static int evaluateBoard(ChessPiece board[][], Player player) {
-		int rank = 0;
-
-		ArrayList<Pawn> compPawns = new ArrayList<Pawn>();
-		ArrayList<Pawn> playerPawns = new ArrayList<Pawn>();
-
-		ArrayList<Bishop> compBishops = new ArrayList<Bishop>();
-		ArrayList<Bishop> playerBishops = new ArrayList<Bishop>();
-
-		ArrayList<Knight> compKnights = new ArrayList<Knight>();
-		ArrayList<Knight> playerKnights = new ArrayList<Knight>();
-
-		ArrayList<Rook> compRooks = new ArrayList<Rook>();
-		ArrayList<Rook> playerRooks = new ArrayList<Rook>();
-
-		int playerQueenCount = 0;
-		int compQueenCount = 0;
-
-		int playerKingCount = 0;
-		int compKingCount = 0;
-
-		for (ChessPiece piece : player.opponent.getMyTeam()) {
-			if (piece instanceof Pawn) playerPawns.add((Pawn) piece);
-			if (piece instanceof Bishop) playerBishops.add((Bishop) piece);
-			if (piece instanceof Knight) playerKnights.add((Knight) piece);
-			if (piece instanceof Rook) playerRooks.add((Rook) piece);
-			if (piece instanceof Queen) playerQueenCount = 1;
-			if (piece instanceof King) playerKingCount = 1;
-		}
-
-		for (ChessPiece piece : player.getMyTeam()) {
-			if (piece instanceof Pawn) compPawns.add((Pawn) piece);
-			if (piece instanceof Bishop) compBishops.add((Bishop) piece);
-			if (piece instanceof Knight) compKnights.add((Knight) piece);
-			if (piece instanceof Rook) compRooks.add((Rook) piece);
-			if (piece instanceof Queen) compQueenCount = 1;
-			if (piece instanceof King) compKingCount = 1;
-		}
-
-		rank = KING_WEIGHT * (compKingCount - playerKingCount)
-				+ QUEEN_WEIGHT * (compQueenCount - playerQueenCount)
-				+ ROOK_WEIGHT * (compRooks.size() - playerRooks.size())
-				+ BISHOP_WEIGHT * (compBishops.size() - playerBishops.size())
-				+ KNIGHT_WEIGHT * (compKnights.size() - playerKnights.size())
-				+ PAWN_WEIGHT * (compPawns.size() - playerPawns.size());
-
-		//System.out.println("rank: " + rank);
-		return rank;
-
+		return evaluateMaterial(board, player) + evaluateRookBonus(board, player) + evaluatePawnBonus(board, player);
 	}
 
 

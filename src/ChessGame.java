@@ -36,6 +36,7 @@ public class ChessGame {
 		}
 		moveCount++;
 		ChessApplication.UpdateDisplay();
+		
 		UpdateAI(currentPlayer.getMyTeam());
 
 		currentPlayer = player1;
@@ -44,7 +45,8 @@ public class ChessGame {
 	}
 
 	private static void UpdateAI(ArrayList<ChessPiece> pieces) {
-		int depth = 3; //must be >=1, if depth is less than 1 it just acts like it equals 1
+		
+		int depth = 1; //must be >=1, if depth is less than 1 it just acts like it equals 1
 		//ChessPiece bestPiece = null;
 		//Position bestMove = null;
 		int startColumn = -1;
@@ -54,19 +56,24 @@ public class ChessGame {
 		int max = Integer.MIN_VALUE; //so that it'll definitely be replaced with a real value
 		for (ChessPiece piece : currentPlayer.getMyTeam())  {
 			for (Position pos : piece.removeDangerMoves(piece.possibleMoves())) {
+				System.out.println("evaluating move");
 				int oldColumn = piece.getColumn();
 				int oldRow = piece.getRow();
 				ChessPiece oldOccupant = ChessBoard.getBoard()[pos.column][pos.row];
 				ChessBoard.move(piece,  pos);
+				
 				Player temp = otherPlayer;
 				otherPlayer = currentPlayer;
 				currentPlayer = temp;
+				System.out.println("sex " +otherPlayer.myQueens.size());
 				int score = -negaMax(depth -1, Integer.MIN_VALUE + 1, Integer.MAX_VALUE - 1);
+				System.out.println("score: " + score + " piece: " + piece + " potential kill: " + oldOccupant);
 				temp = otherPlayer;
 				otherPlayer = currentPlayer;
 				currentPlayer = temp;
 				ChessBoard.move(piece,  new Position(oldColumn, oldRow));
 				ChessBoard.setChessPiece(pos.column,  pos.row,  oldOccupant);
+				
 				if( score > max ) {
 					max = score;
 					startColumn = piece.getColumn();
@@ -150,14 +157,15 @@ public class ChessGame {
 	}*/
 
 	public static int negaMax(int depth, int alpha, int beta) {
-		if (depth <= 0) {
-			return Player.evaluateBoard(ChessBoard.getBoard(), currentPlayer);
-		}
-
 		if(currentPlayer.hasWon())
 		{
 			return Integer.MAX_VALUE;
 		}
+		if (depth <= 0) {
+			return Player.evaluateBoard(ChessBoard.getBoard(), currentPlayer);
+		}
+
+		
 
 
 		for (ChessPiece piece : currentPlayer.getMyTeam())  {

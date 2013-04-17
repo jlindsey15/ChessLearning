@@ -198,7 +198,7 @@ public class ChessBoard {
 
 			}
 
-			move(currentlySelectedPiece, new Position(column, row));
+			ChessGame.currentPlayer.makeMove(currentlySelectedPiece, new Position(column, row));
 			if (currentlySelectedPiece instanceof Pawn) {
 				if ((currentlySelectedPiece.isOnWhiteTeam && row == 7) || (!currentlySelectedPiece.isOnWhiteTeam && row == 0)) {
 					System.out.println("CHANGE");
@@ -247,6 +247,46 @@ public class ChessBoard {
 		pieces[x][y] = piece;
 		tiles[x][y].removeOccupant();
 		tiles[x][y].setOccupant(pieces[x][y]);
+		if (piece != null) {
+			try {
+				Player player = piece.player;
+
+				if (piece instanceof Pawn) {
+					if (!player.myPawns.contains(piece)) {
+						player.myPawns.add((Pawn)piece);
+					}
+				}
+				else if (piece instanceof Rook) {
+					if (!player.myRooks.contains(piece)) {
+						player.myRooks.add((Rook)piece);
+					}
+				}
+				if (piece instanceof Bishop) {
+					if (!player.myBishops.contains(piece)) {
+						player.myBishops.add((Bishop)piece);
+					}
+				}
+				if (piece instanceof Knight) {
+					if (!player.myKnights.contains(piece)) {
+						player.myKnights.add((Knight)piece);
+					}
+				}
+				if (piece instanceof King) {
+					if (!player.myKings.contains(piece)) {
+						player.myKings.add((King)piece);
+					}
+				}
+				if (piece instanceof Queen) {
+					if (!player.myQueens.contains(piece)) {
+						player.myQueens.add((Queen)piece);
+					}
+				}
+
+			}
+			catch (NullPointerException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	public static ChessPiece removeChessPiece(int x, int y) {		
@@ -269,12 +309,17 @@ public class ChessBoard {
 	}
 
 	public static void move(ChessPiece piece, Position pos) {
-		
+
 		try {
+			ChessPiece thing = ChessBoard.getBoard()[pos.column][pos.row];
 			removeChessPiece(piece.getColumn(), piece.getRow());
 			setChessPiece(pos.column, pos.row, piece);
 			piece.setPosition(new Position(pos.column, pos.row));
-			
+			if (thing != null) {
+				
+				thing.player.refreshArrayLists();
+			}
+
 		} catch (NullPointerException ex) {}
 	}
 
