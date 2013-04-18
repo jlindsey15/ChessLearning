@@ -2,15 +2,16 @@ import java.util.ArrayList;
 
 
 public class Player {
-	private static final int PAWN_WEIGHT = 2;
-	private static final int ROOK_WEIGHT = 9;
-	private static final int BISHOP_WEIGHT = 6;
-	private static final int KNIGHT_WEIGHT = 6;
-	private static final int QUEEN_WEIGHT = 18;
+	private static final int PAWN_WEIGHT = 100;
+	private static final int ROOK_WEIGHT = 500;
+	private static final int BISHOP_WEIGHT = 330;
+	private static final int KNIGHT_WEIGHT = 320;
+	private static final int QUEEN_WEIGHT = 900;
 	private static final int KING_WEIGHT = 200000000;
-	private static final int ROOK_ON_SEVEN_BONUS = 5;
 	private static final int ROOK_ALONE_BONUS = 5;
-	private static final int PAWN_ISOLATION_PENALTY = -5;
+	private static final int PAWN_ISOLATION_PENALTY = -3;
+	private static final int PAWN_BACKWARD_PENALTY = -5;
+	private static final int PAWN_DOUBLED_PENALTY = -4;
 
 	public boolean isOnWhiteTeam;
 	public Player opponent;
@@ -244,20 +245,7 @@ public class Player {
 
 	public static int evaluateRookBonus(ChessPiece board[][], Player player) {
 		int count = 0;
-		for (Rook rook : player.myRooks) {
-			if (rook.getRow() == 6) {
-				count += ROOK_ON_SEVEN_BONUS;
-			}
 
-		}
-		for (Rook rook : player.opponent.myRooks) {
-			if (rook.getRow() == 1) {
-				count -= ROOK_ON_SEVEN_BONUS;
-			}
-		}
-		if (!player.isOnWhiteTeam) {
-			count = -count;
-		}
 		int aloneBonus = ROOK_ALONE_BONUS;
 		for (Rook rook : player.myRooks) {
 			int column = rook.getColumn();
@@ -280,69 +268,217 @@ public class Player {
 
 		for (Pawn pawn : player.myPawns) {
 			int column = pawn.getColumn();
+			int row = pawn.getRow();
 			int left = column - 1;
 			int right = column + 1;
+			int bonus;
+			int doubleBonus;
 
 			if (0 <= left && left < 8) {
-				int bonus = PAWN_ISOLATION_PENALTY;
-				for (int i = 0; player.isOnWhiteTeam? (i <= pawn.getRow()) : (i >= pawn.getRow()); i ++) {
-					if (ChessBoard.getBoard()[left][i] instanceof Pawn && ChessBoard.getBoard()[left][i].isOnWhiteTeam == player.isOnWhiteTeam) {
-						bonus = 0;
-						break;
+				bonus = PAWN_ISOLATION_PENALTY;
+				doubleBonus = PAWN_BACKWARD_PENALTY;
+
+				for (Pawn otherPawn : player.myPawns) {
+					if (otherPawn.getColumn() == left) {
+						if (otherPawn != pawn) {
+							bonus = 0;
+							if (player.isOnWhiteTeam) {
+								if (otherPawn.getColumn() == left && otherPawn.getRow()<= row) {
+									doubleBonus = 0;
+								}
+							}
+						}
 					}
 				}
 				count += bonus;
+				count += doubleBonus;
 			}
 
 			if (0 <= right && right < 8) {
-				int bonus = PAWN_ISOLATION_PENALTY;
-				for (int i = 0; i < 8; i ++) {
-					if (ChessBoard.getBoard()[right][i] instanceof Pawn && ChessBoard.getBoard()[right][i].isOnWhiteTeam == player.isOnWhiteTeam) {
-						bonus = 0;
-						break;
+				bonus = PAWN_ISOLATION_PENALTY;
+				doubleBonus = PAWN_BACKWARD_PENALTY;
+				for (Pawn otherPawn : player.myPawns) {
+					if (otherPawn.getColumn() == left) {
+						if (otherPawn != pawn) {
+							bonus = 0;
+							if (player.isOnWhiteTeam) {
+								if (otherPawn.getColumn() == left && otherPawn.getRow()<= row) {
+									doubleBonus = 0;
+								}
+							}
+						}
 					}
 				}
 				count += bonus;
+				count += doubleBonus;
 			}
-			
+			bonus = 0;
+			for (Pawn otherPawn : player.myPawns) {
+				if (otherPawn.getColumn() == column) {
+					if (otherPawn != pawn) {
+						bonus = PAWN_DOUBLED_PENALTY;
+					}
+				}
+			}
+			count += bonus;
+
 
 		}
 		for (Pawn pawn : player.opponent.myPawns) {
 			int column = pawn.getColumn();
+			int row = pawn.getRow();
 			int left = column - 1;
 			int right = column + 1;
+			int bonus;
+			int doubleBonus;
 
 			if (0 <= left && left < 8) {
-				int bonus = PAWN_ISOLATION_PENALTY;
-				for (int i = 0; player.opponent.isOnWhiteTeam? (i <= pawn.getRow()) : (i >= pawn.getRow()); i ++) {
-					if (ChessBoard.getBoard()[left][i] instanceof Pawn && ChessBoard.getBoard()[left][i].isOnWhiteTeam == player.opponent.isOnWhiteTeam) {
-						bonus = 0;
-						break;
+				bonus = PAWN_ISOLATION_PENALTY;
+				doubleBonus = PAWN_BACKWARD_PENALTY;
+
+				for (Pawn otherPawn : player.opponent.myPawns) {
+					if (otherPawn.getColumn() == left) {
+						if (otherPawn != pawn) {
+							bonus = 0;
+							if (player.opponent.isOnWhiteTeam) {
+								if (otherPawn.getColumn() == left && otherPawn.getRow()<= row) {
+									doubleBonus = 0;
+								}
+							}
+						}
 					}
 				}
 				count -= bonus;
+				count -= doubleBonus;
 			}
 
 			if (0 <= right && right < 8) {
-				int bonus = PAWN_ISOLATION_PENALTY;
-				for (int i = 0; i < 8; i ++) {
-					if (ChessBoard.getBoard()[right][i] instanceof Pawn && ChessBoard.getBoard()[right][i].isOnWhiteTeam == player.opponent.isOnWhiteTeam) {
-						bonus = 0;
-						break;
+				bonus = PAWN_ISOLATION_PENALTY;
+				doubleBonus = PAWN_BACKWARD_PENALTY;
+				for (Pawn otherPawn : player.myPawns) {
+					if (otherPawn.getColumn() == left) {
+						if (otherPawn != pawn) {
+							bonus = 0;
+							if (player.opponent.isOnWhiteTeam) {
+								if (otherPawn.getColumn() == left && otherPawn.getRow()<= row) {
+									doubleBonus = 0;
+								}
+							}
+						}
 					}
 				}
 				count -= bonus;
+				count -= doubleBonus;
 			}
-			
+			bonus = 0;
+			for (Pawn otherPawn : player.opponent.myPawns) {
+				if (otherPawn.getColumn() == column) {
+					if (otherPawn != pawn) {
+						bonus = PAWN_DOUBLED_PENALTY;
+					}
+				}
+			}
+			count -= bonus;
+
 
 		}
 		System.out.println("PAWN BONUS " + count);
 		return count;
 	}
 
+	public static int evaluatePieceSquare(ChessPiece board[][], Player player) {
+		int count = 0;
+		if (!player.isOnWhiteTeam) {
+			for (Pawn pawn : player.myPawns) {
+				count += PieceSquare.blackPawn[pawn.getRow()][pawn.getColumn()];
+			}
+			for (Bishop bishop : player.myBishops) {
+				count += PieceSquare.blackBishop[bishop.getRow()][bishop.getColumn()];
+			}
+			for (Knight knight : player.myKnights) {
+				count += PieceSquare.blackKnight[knight.getRow()][knight.getColumn()];
+			}
+			for (Rook rook : player.myRooks) {
+				count += PieceSquare.blackRook[rook.getRow()][rook.getColumn()];
+			}
+			for (Queen queen : player.myQueens) {
+				count += PieceSquare.blackQueen[queen.getRow()][queen.getColumn()];
+			}
+			for (King king : player.myKings) {
+				count += PieceSquare.blackKingMiddle[king.getRow()][king.getColumn()]; //TODO: opening to middle to endgame interpolation
+			}
+			//***********************************************************************************
+			for (Pawn pawn : player.opponent.myPawns) {
+				count -= PieceSquare.blackPawn[7 - pawn.getRow() ][7 - pawn.getColumn()];
+			}
+			for (Bishop bishop : player.opponent.myBishops) {
+				count -= PieceSquare.blackBishop[7 - bishop.getRow()][7 - bishop.getColumn()];
+			}
+			for (Knight knight : player.opponent.myKnights) {
+				count -= PieceSquare.blackKnight[7 - knight.getRow()][7 - knight.getColumn()];
+			}
+			for (Rook rook : player.opponent.myRooks) {
+				count -= PieceSquare.blackRook[7 - rook.getRow()][7 - rook.getColumn()];
+			}
+			for (Queen queen : player.opponent.myQueens) {
+				count -= PieceSquare.blackQueen[7 - queen.getRow()][7 - queen.getColumn()];
+			}
+			for (King king : player.opponent.myKings) {
+				count -= PieceSquare.blackKingMiddle[7 - king.getRow()][7 - king.getColumn()]; //TODO: opening to middle to endgame interpolation
+			}
+		}
+		else {
+			for (Pawn pawn : player.myPawns) {
+				count += PieceSquare.blackPawn[7 - pawn.getRow()][7 - pawn.getColumn()];
+			}
+			for (Bishop bishop : player.myBishops) {
+				count += PieceSquare.blackBishop[7 - bishop.getRow()][7 - bishop.getColumn()];
+			}
+			for (Knight knight : player.myKnights) {
+				count += PieceSquare.blackKnight[7 - knight.getRow()][7 - knight.getColumn()];
+			}
+			for (Rook rook : player.myRooks) {
+				count += PieceSquare.blackRook[7 - rook.getRow()][7 - rook.getColumn()];
+			}
+			for (Queen queen : player.myQueens) {
+				count += PieceSquare.blackQueen[7 - queen.getRow()][7 - queen.getColumn()];
+			}
+			for (King king : player.myKings) {
+				count += PieceSquare.blackKingMiddle[7 - king.getRow()][7 - king.getColumn()]; //TODO: opening to middle to endgame interpolation
+			}
+			//***********************************************************************************
+			for (Pawn pawn : player.opponent.myPawns) {
+				count -= PieceSquare.blackPawn[pawn.getRow() ][pawn.getColumn()];
+			}
+			for (Bishop bishop : player.opponent.myBishops) {
+				count -= PieceSquare.blackBishop[bishop.getRow()][bishop.getColumn()];
+			}
+			for (Knight knight : player.opponent.myKnights) {
+				count -= PieceSquare.blackKnight[knight.getRow()][knight.getColumn()];
+			}
+			for (Rook rook : player.opponent.myRooks) {
+				count -= PieceSquare.blackRook[rook.getRow()][rook.getColumn()];
+			}
+			for (Queen queen : player.opponent.myQueens) {
+				count -= PieceSquare.blackQueen[queen.getRow()][queen.getColumn()];
+			}
+			for (King king : player.opponent.myKings) {
+				count -= PieceSquare.blackKingMiddle[king.getRow()][king.getColumn()]; //TODO: opening to middle to endgame interpolation
+			}
+		}
+
+		//*****************************************************************88
+
+		//**********************************************************************************
+
+		
+		return count;
+	}
+
 	public static int evaluateBoard(ChessPiece board[][], Player player) {
-		return evaluateMaterial(board, player) + evaluateRookBonus(board, player) + evaluatePawnBonus(board, player);
+		return evaluateMaterial(board, player) + evaluateRookBonus(board, player) + evaluatePawnBonus(board, player) + evaluatePieceSquare(board, player);
 	}
 
 
 }
+

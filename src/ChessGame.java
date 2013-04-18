@@ -46,7 +46,7 @@ public class ChessGame {
 
 	private static void UpdateAI(ArrayList<ChessPiece> pieces) {
 		
-		int depth = 1; //must be >=1, if depth is less than 1 it just acts like it equals 1
+		int depth = 3; //must be >=1, if depth is less than 1 it just acts like it equals 1
 		//ChessPiece bestPiece = null;
 		//Position bestMove = null;
 		int startColumn = -1;
